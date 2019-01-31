@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"fmt"
 
+	"github.com/cihub/seelog"
+
 	eos "github.com/eosforce/goeosforce"
 	"github.com/eosforce/goeosforce/ecc"
 )
@@ -16,6 +18,7 @@ type ConfigSigner struct {
 
 // NewConfigSigner create config signer with keys in config in api
 func NewConfigSigner(api *API) *ConfigSigner {
+	seelog.Infof("cfg %v", api.Cfg)
 	res := &ConfigSigner{
 		Keys: make([]*ecc.PrivateKey, 0),
 		api:  api,
@@ -26,6 +29,10 @@ func NewConfigSigner(api *API) *ConfigSigner {
 	for _, k := range api.Cfg.Prikeys {
 		res.Keys = append(res.Keys, &k)
 	}
+	for _, k := range res.Keys {
+		seelog.Infof("load key %s", k.PublicKey().String())
+	}
+	seelog.Flush()
 	return res
 }
 

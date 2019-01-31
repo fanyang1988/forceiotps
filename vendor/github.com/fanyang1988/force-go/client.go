@@ -16,6 +16,7 @@ func NewClient(cfg *config.Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	api.Debug = false
 
 	return &Client{
 		api: api,

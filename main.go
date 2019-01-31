@@ -24,13 +24,17 @@ func init() {
 }
 
 func send(num int, url string) {
-	client, err := force.NewClientFromFile(url)
+	var cc config.Config
+	cc = cfg
+	cc.Prikeys = cfg.Prikeys
+	cc.URL = url
+	client, err := force.NewClient(&cc)
 	if err != nil {
 		seelog.Errorf("connect err by %s", err.Error())
 		return
 	}
 
-	q, err := eos.NewAsset("0.0100 SYS")
+	q, err := eos.NewAsset("0.0100 EOS")
 	if err != nil {
 		seelog.Errorf("asset err by %s", err.Error())
 		return
@@ -52,14 +56,19 @@ type tpsCfg struct {
 	Urls []string `json:"urls"`
 }
 
+var cfg config.Config
+
 func main() {
 	defer seelog.Flush()
 	flag.Parse()
 
 	var tc tpsCfg
 	config.LoadJSONFile("./tps.json", &tc)
+	pcfg, _ := config.LoadCfgFromFile("./config.json")
+	cfg = *pcfg
 
 	seelog.Infof("sned urls %v", tc.Urls)
+	seelog.Infof("cfg %v", cfg)
 
 	for i := 0; i < *threadNum; i++ {
 		go send(i, tc.Urls[i%len(tc.Urls)])
